@@ -60,6 +60,11 @@ public class BaseBlock {
      * @return the type
      */
     public int getType() {
+        // Begin Tulon hack
+        if (type < 0) {
+            return (int) type + 256;
+        }
+        // End Tulon hack
         return (int) type;
     }
 
