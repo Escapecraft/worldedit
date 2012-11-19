@@ -48,7 +48,7 @@ import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Boat;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.ExperienceOrb;
-import org.bukkit.entity.FallingSand;
+import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
@@ -82,11 +82,12 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.TreeGenerator;
 
 public class BukkitWorld extends LocalWorld {
-    
+
     private static final Logger logger = Logger.getLogger(BukkitWorld.class.getCanonicalName());
     private World world;
     private boolean skipNmsAccess = false;
     private boolean skipNmsSafeSet = false;
+    private boolean skipNmsValidBlockCheck = false;
 
     /**
      * Construct the object.
@@ -694,7 +695,7 @@ public class BukkitWorld extends LocalWorld {
                     ++num;
                 }
             } else if (type == EntityType.FALLING_BLOCKS) {
-                if (ent instanceof FallingSand) {
+                if (ent instanceof FallingBlock) {
                     ent.remove();
                     ++num;
                 }
@@ -866,7 +867,16 @@ public class BukkitWorld extends LocalWorld {
      */
     @Override
     public boolean isValidBlockType(int type) {
-        return type <= 4095 && Material.getMaterial(type) != null;
+        if (!skipNmsValidBlockCheck) {
+            try {
+                return type == 0 || (type >= 1 && type < net.minecraft.server.Block.byId.length
+                        && net.minecraft.server.Block.byId[type] != null);
+            } catch (Exception e) {
+                logger.log(Level.SEVERE, "Error checking NMS valid block type", e);
+                skipNmsValidBlockCheck = true;
+            }
+        }
+        return Material.getMaterial(type) != null && Material.getMaterial(type).isBlock();
     }
 
     @Override
@@ -987,10 +997,10 @@ public class BukkitWorld extends LocalWorld {
                 }
             }
         }
-        
+
         return super.getBlock(pt);
     }
-    
+
     @Override
     public boolean setBlock(Vector pt, com.sk89q.worldedit.foundation.Block block, boolean notifyAdjacent) {
         if (!skipNmsSafeSet) {
@@ -1002,7 +1012,7 @@ public class BukkitWorld extends LocalWorld {
                 skipNmsSafeSet = true;
             }
         }
-        
+
         return super.setBlock(pt, block, notifyAdjacent);
     }
 }

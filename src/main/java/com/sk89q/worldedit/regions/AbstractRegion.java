@@ -35,6 +35,11 @@ public abstract class AbstractRegion implements Region {
         this.world = world;
     }
 
+    @Override
+    public Vector getCenter() {
+        return getMinimumPoint().add(getMaximumPoint()).divide(2);
+    }
+
     /**
      * Get the iterator.
      *
@@ -50,16 +55,6 @@ public abstract class AbstractRegion implements Region {
 
     public void setWorld(LocalWorld world) {
         this.world = world;
-    }
-
-    @Deprecated
-    public void expand(Vector change) throws RegionOperationException {
-        expand(new Vector[] { change });
-    }
-
-    @Deprecated
-    public void contract(Vector change) throws RegionOperationException {
-        contract(new Vector[] { change });
     }
 
     public void shift(Vector change) throws RegionOperationException {

@@ -19,10 +19,10 @@
 
 package com.sk89q.worldedit.blocks;
 
+import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.HashMap;
-import java.util.EnumSet;
 import java.util.Random;
 import java.util.Set;
 
@@ -167,11 +167,20 @@ public enum BlockType {
     EMERALD_ORE(BlockID.EMERALD_ORE, "Emerald ore", "emeraldore"),
     ENDER_CHEST(BlockID.ENDER_CHEST, "Ender chest", "enderchest"),
     TRIPWIRE_HOOK(BlockID.TRIPWIRE_HOOK, "Tripwire hook", "tripwirehook"),
-    TRIPWIRE(BlockID.TRIPWIRE, "Tripwire", "tripwire"),
-    EMERALD_BLOCK(BlockID.EMERALD_BLOCK, "Emerald block", "emeraldblock"),
+    TRIPWIRE(BlockID.TRIPWIRE, "Tripwire", "tripwire", "string"),
+    EMERALD_BLOCK(BlockID.EMERALD_BLOCK, "Emerald block", "emeraldblock", "emerald"),
     SPRUCE_WOOD_STAIRS(BlockID.SPRUCE_WOOD_STAIRS, "Spruce wood stairs", "sprucestairs", "sprucewoodstairs"),
     BIRCH_WOOD_STAIRS(BlockID.BIRCH_WOOD_STAIRS, "Birch wood stairs", "birchstairs", "birchwoodstairs"),
-    JUNGLE_WOOD_STAIRS(BlockID.JUNGLE_WOOD_STAIRS, "Jungle wood stairs", "junglestairs", "junglewoodstairs");
+    JUNGLE_WOOD_STAIRS(BlockID.JUNGLE_WOOD_STAIRS, "Jungle wood stairs", "junglestairs", "junglewoodstairs"),
+    COMMAND_BLOCK(BlockID.COMMAND_BLOCK, "Command block", "commandblock", "cmdblock", "command", "cmd"),
+    BEACON(BlockID.BEACON, "Beacon", "beacon", "beaconblock"),
+    COBBLESTONE_WALL(BlockID.COBBLESTONE_WALL, "Cobblestone wall", "cobblestonewall", "cobblewall"),
+    FLOWER_POT(BlockID.FLOWER_POT, "Flower pot", "flowerpot", "plantpot", "pot"),
+    CARROTS(BlockID.CARROTS, "Carrots", "carrots", "carrotsplant", "carrotsblock"),
+    POTATOES(BlockID.POTATOES, "Potatoes", "patatoes", "potatoesblock"),
+    WOODEN_BUTTON(BlockID.WOODEN_BUTTON, "Wooden button", "woodbutton", "woodenbutton"),
+    HEAD(BlockID.HEAD, "Head", "head", "headmount", "mount"),
+    ANVIL(BlockID.ANVIL, "Anvil", "anvil", "blacksmith");
 
     /**
      * Stores a map of the IDs for fast access.
@@ -317,6 +326,11 @@ public enum BlockType {
         shouldPlaceLast.add(BlockID.COCOA_PLANT);
         shouldPlaceLast.add(BlockID.TRIPWIRE_HOOK);
         shouldPlaceLast.add(BlockID.TRIPWIRE);
+        shouldPlaceLast.add(BlockID.FLOWER_POT);
+        shouldPlaceLast.add(BlockID.CARROTS);
+        shouldPlaceLast.add(BlockID.POTATOES);
+        shouldPlaceLast.add(BlockID.WOODEN_BUTTON);
+        shouldPlaceLast.add(BlockID.HEAD);
     }
 
     /**
@@ -410,6 +424,11 @@ public enum BlockType {
         canPassThrough.add(BlockID.END_PORTAL);
         canPassThrough.add(BlockID.TRIPWIRE_HOOK);
         canPassThrough.add(BlockID.TRIPWIRE);
+        canPassThrough.add(BlockID.FLOWER_POT);
+        canPassThrough.add(BlockID.CARROTS);
+        canPassThrough.add(BlockID.POTATOES);
+        canPassThrough.add(BlockID.WOODEN_BUTTON);
+        canPassThrough.add(BlockID.HEAD);
     }
 
     /**
@@ -572,6 +591,13 @@ public enum BlockType {
         usesData.add(BlockID.SPRUCE_WOOD_STAIRS);
         usesData.add(BlockID.BIRCH_WOOD_STAIRS);
         usesData.add(BlockID.JUNGLE_WOOD_STAIRS);
+        usesData.add(BlockID.COBBLESTONE_WALL);
+        usesData.add(BlockID.FLOWER_POT);
+        usesData.add(BlockID.CARROTS);
+        usesData.add(BlockID.POTATOES);
+        usesData.add(BlockID.WOODEN_BUTTON);
+        usesData.add(BlockID.HEAD);
+        usesData.add(BlockID.ANVIL);
     }
 
     /**
@@ -649,6 +675,8 @@ public enum BlockType {
         isRedstoneBlock.add(BlockID.REDSTONE_REPEATER_OFF);
         isRedstoneBlock.add(BlockID.REDSTONE_REPEATER_ON);
         isRedstoneBlock.add(BlockID.TRIPWIRE_HOOK);
+        isRedstoneBlock.add(BlockID.COMMAND_BLOCK);
+        isRedstoneBlock.add(BlockID.WOODEN_BUTTON);
     }
 
     /**
@@ -716,6 +744,7 @@ public enum BlockType {
         isRedstoneSource.add(BlockID.WOODEN_PRESSURE_PLATE);
         isRedstoneSource.add(BlockID.STONE_BUTTON);
         isRedstoneSource.add(BlockID.TRIPWIRE_HOOK);
+        isRedstoneSource.add(BlockID.WOODEN_BUTTON);
     }
 
     /**
@@ -931,6 +960,13 @@ public enum BlockType {
         isTranslucent.add(BlockID.SPRUCE_WOOD_STAIRS);
         isTranslucent.add(BlockID.BIRCH_WOOD_STAIRS);
         isTranslucent.add(BlockID.JUNGLE_WOOD_STAIRS);
+        isTranslucent.add(BlockID.COBBLESTONE_WALL);
+        isTranslucent.add(BlockID.FLOWER_POT);
+        isTranslucent.add(BlockID.CARROTS);
+        isTranslucent.add(BlockID.POTATOES);
+        isTranslucent.add(BlockID.WOODEN_BUTTON);
+        isTranslucent.add(BlockID.HEAD);
+        isTranslucent.add(BlockID.ANVIL);
     }
 
     /**
