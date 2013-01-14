@@ -356,7 +356,7 @@ public class UtilityCommands {
     @Command(
         aliases = { "butcher" },
         usage = "[radius]",
-        flags = "plangf",
+        flags = "plangbf",
         desc = "Kill all or nearby mobs",
         help =
             "Kills nearby mobs, based on radius, if none is given uses default in configuration.\n" +
@@ -365,6 +365,7 @@ public class UtilityCommands {
             "  -n also kills NPCs.\n" +
             "  -g also kills Golems.\n" +
             "  -a also kills animals.\n" +
+            "  -b also kills ambient mobs.\n" +
             "  -f compounds all previous flags.\n" +
             "  -l strikes lightning on each killed mob.",
         min = 0,
@@ -399,6 +400,7 @@ public class UtilityCommands {
         flags.or(KillFlags.NPCS          , args.hasFlag('n'), "worldedit.butcher.npcs");
         flags.or(KillFlags.GOLEMS        , args.hasFlag('g'), "worldedit.butcher.golems");
         flags.or(KillFlags.ANIMALS       , args.hasFlag('a'), "worldedit.butcher.animals");
+        flags.or(KillFlags.AMBIENT       , args.hasFlag('b'), "worldedit.butcher.ambient");
         flags.or(KillFlags.WITH_LIGHTNING, args.hasFlag('l'), "worldedit.butcher.lightning");
 
         int killed;
@@ -460,8 +462,10 @@ public class UtilityCommands {
 
         EntityType type = null;
 
-        if (typeStr.matches("arrows?")) {
-            type = EntityType.ARROWS;
+        if (typeStr.matches("all")) {
+            type = EntityType.ALL;
+        } else if (typeStr.matches("projectiles?|arrows?")) {
+            type = EntityType.PROJECTILES;
         } else if (typeStr.matches("items?")
                 || typeStr.matches("drops?")) {
             type = EntityType.ITEMS;
@@ -470,6 +474,8 @@ public class UtilityCommands {
         } else if (typeStr.matches("paintings?")
                 || typeStr.matches("art")) {
             type = EntityType.PAINTINGS;
+        } else if (typeStr.matches("(item)frames?")) {
+            type = EntityType.ITEM_FRAMES;
         } else if (typeStr.matches("boats?")) {
             type = EntityType.BOATS;
         } else if (typeStr.matches("minecarts?")
@@ -480,7 +486,7 @@ public class UtilityCommands {
         } else if (typeStr.matches("xp")) {
             type = EntityType.XP_ORBS;
         } else {
-            player.printError("Acceptable types: arrows, items, paintings, boats, minecarts, tnt, xp");
+            player.printError("Acceptable types: projectiles, items, paintings, itemframes, boats, minecarts, tnt, xp, or all");
             return;
         }
 
@@ -497,6 +503,7 @@ public class UtilityCommands {
         max = -1
     )
     @Console
+    @CommandPermissions("worldedit.help")
     public void help(CommandContext args, LocalSession session, LocalPlayer player,
             EditSession editSession) throws WorldEditException {
 

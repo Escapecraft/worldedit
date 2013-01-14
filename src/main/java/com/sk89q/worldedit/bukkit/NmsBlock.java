@@ -14,7 +14,7 @@
  *
  * You should have received a copy of the GNU Lesser General Public License along with
  * this program. If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 package com.sk89q.worldedit.bukkit;
 
@@ -308,7 +308,7 @@ class NmsBlock extends BaseBlock implements TileEntityBlock {
                 } catch (Throwable t) {
                     try {
                         logger.warning("WorldEdit: Couldn't get NBTTagCompound.c(), " +
-                        		"so we're going to try to get at the 'map' field directly from now on");
+                                "so we're going to try to get at the 'map' field directly from now on");
 
                         if (compoundMapField == null) {
                             compoundMapField = NBTTagCompound.class.getDeclaredField("map");
@@ -433,5 +433,10 @@ class NmsBlock extends BaseBlock implements TileEntityBlock {
             throw new IllegalArgumentException("Don't know how to make NMS "
                     + foreign.getClass().getCanonicalName());
         }
+    }
+
+    public static boolean isValidBlockType(int type) throws NoClassDefFoundError {
+        return type == 0 || (type >= 1 && type < net.minecraft.server.Block.byId.length
+                && net.minecraft.server.Block.byId[type] != null);
     }
 }
