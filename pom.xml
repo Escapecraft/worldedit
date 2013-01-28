@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.sk89q</groupId>
   <artifactId>worldedit</artifactId>
-  <version>5.5.1-ec.1</version>
+  <version>5.5.2-1.4.7-ec</version>
   <name>WorldEdit</name>
   <description>WorldEdit allows for editing the Minecraft SMP world
     en-masse, de-griefing, and fixing issues.</description>
@@ -54,7 +54,7 @@
     <dependency>
       <groupId>com.sk89q</groupId>
       <artifactId>dummypermscompat</artifactId>
-      <version>1.6</version>
+      <version>1.7</version>
       <scope>compile</scope>
       <optional>true</optional>
     </dependency>
@@ -88,14 +88,14 @@
     <dependency>
       <groupId>org.bukkit</groupId>
       <artifactId>bukkit</artifactId>
-      <version>1.4.6-R0.3</version>
+      <version>1.4.7-R0.1</version>
       <scope>compile</scope>
       <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.bukkit</groupId>
       <artifactId>craftbukkit</artifactId>
-      <version>1.4.6-R0.3-hydrox-tulon-3</version>
+      <version>1.4.7-R0.1</version>
       <scope>compile</scope>
       <optional>true</optional>
     </dependency>
@@ -140,6 +140,14 @@
         <directory>${basedir}/src/main/resources/</directory>
         <includes>
           <include>config.yml</include>
+        </includes>
+      </resource>
+      <resource>
+        <targetPath>nmsblocks/</targetPath>
+        <filtering>false</filtering>
+        <directory>${basedir}/src/main/resources/nmsblocks/</directory>
+        <includes>
+          <include>*.class</include>
         </includes>
       </resource>
     </resources>
@@ -278,7 +286,7 @@
         <dependency>
           <groupId>org.spout</groupId>
           <artifactId>vanilla</artifactId>
-          <version>1.3.2-SNAPSHOT</version>
+          <version>1.4.7-SNAPSHOT</version>
           <optional>true</optional>
         </dependency>
       </dependencies>

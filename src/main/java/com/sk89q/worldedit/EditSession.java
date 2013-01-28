@@ -194,7 +194,7 @@ public class EditSession {
         final int existing = world.getBlockType(pt);
 
         // Clear the container block so that it doesn't drop items
-        if (BlockType.isContainerBlock(existing) && blockBag == null) {
+        if (BlockType.isContainerBlock(existing)) {
             world.clearContainerBlockContents(pt);
             // Ice turns until water so this has to be done first
         } else if (existing == BlockID.ICE) {
@@ -525,15 +525,39 @@ public class EditSession {
         return false;
     }
 
+    public int countBlock(Region region, Set<Integer> searchIDs) {
+        Set<BaseBlock> passOn = new HashSet<BaseBlock>();
+        for (Integer i : searchIDs) {
+            passOn.add(new BaseBlock(i, -1));
+        }
+        return countBlocks(region, passOn);
+    }
+
     /**
      * Count the number of blocks of a list of types in a region.
      *
      * @param region
-     * @param searchIDs
+     * @param searchBlocks
      * @return
      */
-    public int countBlocks(Region region, Set<Integer> searchIDs) {
+    public int countBlocks(Region region, Set<BaseBlock> searchBlocks) {
         int count = 0;
+
+        // allow -1 data in the searchBlocks to match any type
+        Set<BaseBlock> newSet = new HashSet<BaseBlock>() {
+            @Override
+            public boolean contains(Object o) {
+                for (BaseBlock b : this.toArray(new BaseBlock[this.size()])) {
+                    if (o instanceof BaseBlock) {
+                        if (b.equalsFuzzy((BaseBlock) o)) {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+        };
+        newSet.addAll(searchBlocks);
 
         if (region instanceof CuboidRegion) {
             // Doing this for speed
@@ -552,7 +576,8 @@ public class EditSession {
                     for (int z = minZ; z <= maxZ; ++z) {
                         Vector pt = new Vector(x, y, z);
 
-                        if (searchIDs.contains(getBlockType(pt))) {
+                        BaseBlock compare = new BaseBlock(getBlockType(pt), getBlockData(pt));
+                        if (newSet.contains(compare)) {
                             ++count;
                         }
                     }
@@ -560,7 +585,8 @@ public class EditSession {
             }
         } else {
             for (Vector pt : region) {
-                if (searchIDs.contains(getBlockType(pt))) {
+                BaseBlock compare = new BaseBlock(getBlockType(pt), getBlockData(pt));
+                if (newSet.contains(compare)) {
                     ++count;
                 }
             }
@@ -2482,7 +2508,6 @@ public class EditSession {
         int h = prng.nextInt(3) - 1;
 
         BaseBlock log = new BaseBlock(BlockID.LOG);
-        BaseBlock pumpkin = new BaseBlock(BlockID.PUMPKIN);
 
         switch (t) {
         case 0:
@@ -2492,7 +2517,7 @@ public class EditSession {
             if (prng.nextBoolean()) {
                 setBlockIfAir(pos.add(1, h, -1), log);
             }
-            setBlockIfAir(pos.add(0, 0, -1), pumpkin);
+            setBlockIfAir(pos.add(0, 0, -1), new BaseBlock(BlockID.PUMPKIN, prng.nextInt(4)));
             break;
 
         case 1:
@@ -2502,7 +2527,7 @@ public class EditSession {
             if (prng.nextBoolean()) {
                 setBlockIfAir(pos.add(1, h, 0), log);
             }
-            setBlockIfAir(pos.add(1, 0, 1), pumpkin);
+            setBlockIfAir(pos.add(1, 0, 1), new BaseBlock(BlockID.PUMPKIN, prng.nextInt(4)));
             break;
 
         case 2:
@@ -2512,7 +2537,7 @@ public class EditSession {
             if (prng.nextBoolean()) {
                 setBlockIfAir(pos.add(-1, h, 0), log);
             }
-            setBlockIfAir(pos.add(-1, 0, 1), pumpkin);
+            setBlockIfAir(pos.add(-1, 0, 1), new BaseBlock(BlockID.PUMPKIN, prng.nextInt(4)));
             break;
 
         case 3:
@@ -2522,7 +2547,7 @@ public class EditSession {
             if (prng.nextBoolean()) {
                 setBlockIfAir(pos.add(-1, h, -1), log);
             }
-            setBlockIfAir(pos.add(-1, 0, -1), pumpkin);
+            setBlockIfAir(pos.add(-1, 0, -1), new BaseBlock(BlockID.PUMPKIN, prng.nextInt(4)));
             break;
         }
     }
@@ -2661,6 +2686,65 @@ public class EditSession {
                 } else {
                     Countable<Integer> c = new Countable<Integer>(id, 1);
                     map.put(id, c);
+                }
+            }
+        }
+
+        Collections.sort(distribution);
+        // Collections.reverse(distribution);
+
+        return distribution;
+    }
+
+    /**
+     * Get the block distribution (with data values) inside a region.
+     *
+     * @param region
+     * @return
+     */
+    // TODO reduce code duplication - probably during ops-redux
+    public List<Countable<BaseBlock>> getBlockDistributionWithData(Region region) {
+        List<Countable<BaseBlock>> distribution = new ArrayList<Countable<BaseBlock>>();
+        Map<BaseBlock, Countable<BaseBlock>> map = new HashMap<BaseBlock, Countable<BaseBlock>>();
+
+        if (region instanceof CuboidRegion) {
+            // Doing this for speed
+            Vector min = region.getMinimumPoint();
+            Vector max = region.getMaximumPoint();
+
+            int minX = min.getBlockX();
+            int minY = min.getBlockY();
+            int minZ = min.getBlockZ();
+            int maxX = max.getBlockX();
+            int maxY = max.getBlockY();
+            int maxZ = max.getBlockZ();
+
+            for (int x = minX; x <= maxX; ++x) {
+                for (int y = minY; y <= maxY; ++y) {
+                    for (int z = minZ; z <= maxZ; ++z) {
+                        Vector pt = new Vector(x, y, z);
+
+                        BaseBlock blk = new BaseBlock(getBlockType(pt), getBlockData(pt));
+
+                        if (map.containsKey(blk)) {
+                            map.get(blk).increment();
+                        } else {
+                            Countable<BaseBlock> c = new Countable<BaseBlock>(blk, 1);
+                            map.put(blk, c);
+                            distribution.add(c);
+                        }
+                    }
+                }
+            }
+        } else {
+            for (Vector pt : region) {
+                BaseBlock blk = new BaseBlock(getBlockType(pt), getBlockData(pt));
+
+                if (map.containsKey(blk)) {
+                    map.get(blk).increment();
+                } else {
+                    Countable<BaseBlock> c = new Countable<BaseBlock>(blk, 1);
+                    map.put(blk, c);
                 }
             }
         }
@@ -2855,4 +2939,5 @@ public class EditSession {
             }
         } // while
     }
+
 }
