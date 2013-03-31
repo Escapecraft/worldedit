@@ -26,10 +26,6 @@
       <comments>License on all new contributions</comments>
     </license>
   </licenses>
-
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
   
   <properties> <!-- Fix encoding warnings -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
