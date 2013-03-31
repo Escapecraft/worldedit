@@ -334,8 +334,7 @@ public class WorldEdit {
                     }
                 } else {
                     // Bound the change limit
-                    int maxChangeLimit = Math.min(config.defaultChangeLimit,
-                            config.maxChangeLimit);
+                    int maxChangeLimit = config.maxChangeLimit;
                     if (currentChangeLimit == -1 || currentChangeLimit > maxChangeLimit) {
                         session.setBlockChangeLimit(maxChangeLimit);
                     }
@@ -671,7 +670,7 @@ public class WorldEdit {
             double chance;
 
             // Parse special percentage syntax
-            if (s.matches("[0-9]+(?:\\.(?:[0-9]+)?)?%.*")) {
+            if (s.matches("[0-9]+(\\.[0-9]*)?%.*")) {
                 String[] p = s.split("%");
                 chance = Double.parseDouble(p[0]);
                 block = getBlock(player, p[1]);
@@ -1399,6 +1398,8 @@ public class WorldEdit {
             } catch (CommandUsageException e) {
                 player.printError(e.getMessage());
                 player.printError(e.getUsage());
+            } catch (PlayerNeededException e) {
+                player.printError(e.getMessage());
             } catch (WrappedCommandException e) {
                 throw e.getCause();
             } catch (UnhandledCommandException e) {

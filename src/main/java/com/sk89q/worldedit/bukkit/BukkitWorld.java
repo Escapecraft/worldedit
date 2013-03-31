@@ -101,9 +101,9 @@ public class BukkitWorld extends LocalWorld {
 
     private static final Logger logger = WorldEdit.logger;
     private World world;
-    private boolean skipNmsAccess = false;
-    private boolean skipNmsSafeSet = false;
-    private boolean skipNmsValidBlockCheck = false;
+    private static boolean skipNmsAccess = false;
+    private static boolean skipNmsSafeSet = false;
+    private static boolean skipNmsValidBlockCheck = false;
 
     /*
      * holder for the nmsblock class that we should use
@@ -114,6 +114,18 @@ public class BukkitWorld extends LocalWorld {
     private static Method nmsGetMethod;
     private static Method nmsSetSafeMethod;
 
+    // copied from WG
+    private static <T extends Enum<T>> T tryEnum(Class<T> enumType, String ... values) {
+        for (String val : values) {
+            try {
+                return Enum.valueOf(enumType, val);
+            } catch (IllegalArgumentException e) {}
+        }
+        return null;
+    }
+    private static org.bukkit.entity.EntityType tntMinecartType;
+    private static boolean checkMinecartType = true;
+
     /**
      * Construct the object.
      * @param world
@@ -121,6 +133,10 @@ public class BukkitWorld extends LocalWorld {
     public BukkitWorld(World world) {
         this.world = world;
 
+        if (checkMinecartType) {
+            tntMinecartType = tryEnum(org.bukkit.entity.EntityType.class, "MINECART_TNT");
+            checkMinecartType = false;
+        }
         // check if we have a class we can use for nms access
 
         // only run once per server startup
@@ -1031,7 +1047,7 @@ public class BukkitWorld extends LocalWorld {
                     ++num;
                 }
             } else if (type == EntityType.TNT) {
-                if (ent instanceof TNTPrimed) {
+                if (ent instanceof TNTPrimed || ent.getType() == tntMinecartType) {
                     ent.remove();
                     ++num;
                 }
