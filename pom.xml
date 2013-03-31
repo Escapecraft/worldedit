@@ -3,9 +3,6 @@
   <groupId>com.sk89q</groupId>
   <artifactId>worldedit</artifactId>
   <version>5.5.6-1.5-ec</version>
-  <name>WorldEdit</name>
-  <description>WorldEdit allows for editing the Minecraft SMP world
-    en-masse, de-griefing, and fixing issues.</description>
   <packaging>jar</packaging>
   
   <!-- Project information -->
@@ -15,7 +12,6 @@
   <description>A voxel map editor for Minecraft with tools for adventure map designers,
     server administrators, and anyone who enjoys building massive structures.</description>
     
->>>>>>> WEteam
   <licenses>
     <license>
       <name>GNU General Public License 2.0</name>
@@ -39,7 +35,6 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
   
->>>>>>> WEteam
   <repositories>
     <repository>
       <id>sk89q-repo</id>
