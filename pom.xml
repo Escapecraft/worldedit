@@ -45,9 +45,6 @@
       <url>http://repo.spout.org/</url>
     </repository>
   </repositories>
-
-  <dependencies>
-  </repositories>
   
   <dependencies>
     <dependency> <!-- Used for snapshots -->
