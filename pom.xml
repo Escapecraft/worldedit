@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.sk89q</groupId>
   <artifactId>worldedit</artifactId>
-  <version>5.5.7-SNAPSHOT</version>
+  <version>5.5.7-1.5.2-ec</version>
   <packaging>jar</packaging>
   
   <!-- Project information -->
@@ -11,6 +11,16 @@
   <url>http://wiki.sk89q.com/wiki/WorldEdit</url>
   <description>A voxel map editor for Minecraft with tools for adventure map designers,
     server administrators, and anyone who enjoys building massive structures.</description>
+  
+  <properties> <!-- Fix encoding warnings -->
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <bukkit.group>org.spigotmc</bukkit.group>
+    <bukkit.artifact>spigot-api</bukkit.artifact>
+    <bukkit.version>1.5.2-R0.2-ec</bukkit.version>
+    <craftbukkit.group>org.spigotmc</craftbukkit.group>
+    <craftbukkit.artifact>spigot</craftbukkit.artifact>
+    <craftbukkit.version>1.5.2-R0.2-ec</craftbukkit.version>
+  </properties>
     
   <licenses>
     <license>
@@ -62,11 +72,11 @@
     </repository>
   </distributionManagement>
   
-  <properties> <!-- Fix encoding warnings -->
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
-  
   <repositories>
+    <repository>
+        <id>ec-repo</id>
+        <url>dev.escapecraft.com/maven/</url>
+    </repository>
     <repository>
       <id>sk89q-repo</id>
       <url>http://maven.sk89q.com/repo/</url>
@@ -114,18 +124,18 @@
     </dependency>
 
     <dependency> <!-- Bukkit implementation -->
-      <groupId>org.bukkit</groupId>
-      <artifactId>bukkit</artifactId>
-      <version>1.5.1-R0.2</version>
+      <groupId>${bukkit.group}</groupId>
+      <artifactId>${bukkit.artifact}</artifactId>
+      <version>${bukkit.version}</version>
       <scope>compile</scope>
       <type>jar</type>
       <optional>true</optional>
     </dependency>
     
     <dependency> <!-- NMS blocks -->
-      <groupId>org.bukkit</groupId>
-      <artifactId>craftbukkit</artifactId>
-      <version>1.5.2-R0.1-SNAPSHOT</version>
+      <groupId>${craftbukkit.group}</groupId>
+      <artifactId>${craftbukkit.artifact}</artifactId>
+      <version>${craftbukkit.version}</version>
       <scope>compile</scope>
       <type>jar</type>
       <optional>true</optional>
