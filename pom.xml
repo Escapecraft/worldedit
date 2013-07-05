@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.sk89q</groupId>
   <artifactId>worldedit</artifactId>
-  <version>5.5.7-1.5.2-dev</version>
+  <version>5.5.8-1.6.1-dev</version>
   <packaging>jar</packaging>
   
   <!-- Project information -->
@@ -85,7 +85,7 @@
     <dependency> <!-- Bukkit implementation -->
       <groupId>org.bukkit</groupId>
       <artifactId>bukkit</artifactId>
-      <version>1.5.2-R1.0</version>
+      <version>1.6.1-R0.1-SNAPSHOT</version>
       <scope>compile</scope>
       <type>jar</type>
       <optional>true</optional>
@@ -94,7 +94,7 @@
     <dependency> <!-- NMS blocks -->
       <groupId>org.bukkit</groupId>
       <artifactId>craftbukkit</artifactId>
-      <version>1.5.2-R1.0</version>
+      <version>1.6.1-R0.1-SNAPSHOT</version>
       <scope>compile</scope>
       <type>jar</type>
       <optional>true</optional>
