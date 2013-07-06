@@ -27,6 +27,41 @@
     </license>
   </licenses>
   
+  <issueManagement>
+    <system>YouTrack</system>
+    <url>http://youtrack.sk89q.com</url>
+  </issueManagement>
+  
+  <ciManagement>
+    <system>Jenkins</system>
+    <url>http://build.sk89q.com</url>
+  </ciManagement>
+  
+  <scm>
+    <connection>scm:git:git://github.com/sk89q/worldedit.git</connection>
+    <developerConnection>scm:git:git@github.com:sk89q/worldedit.git</developerConnection>
+    <url>https://github.com/sk89q/worldedit</url>
+    <tag>master</tag>
+  </scm>
+  
+  <mailingLists>
+    <mailingList>
+      <name>Developer Discussion</name>
+      <archive>https://groups.google.com/d/forum/sk-dev-discuss</archive>
+    </mailingList>
+  </mailingLists>
+  
+  <distributionManagement>
+    <site>
+      <id>sk89q-docs-upload</id>
+      <url>ftp://sk89q-maven-deploy/worldedit/</url>
+    </site>
+    <repository>
+      <id>maven.sk89q.com</id>
+      <url>http://maven.sk89q.com/artifactory/libs-release-local</url>
+    </repository>
+  </distributionManagement>
+  
   <properties> <!-- Fix encoding warnings -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
@@ -39,10 +74,6 @@
     <repository>
       <id>bukkit-repo</id>
       <url>http://repo.bukkit.org/content/groups/public</url>
-    </repository>
-    <repository>
-      <id>spout-repo</id>
-      <url>http://repo.spout.org/</url>
     </repository>
   </repositories>
   
