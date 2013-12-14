@@ -615,10 +615,12 @@ public enum BlockType {
             centralTopLimit.put(-16*BlockID.FENCE_GATE-(data+12), 0.0);
         }
         centralTopLimit.put(BlockID.SLOW_SAND, 0.875);
+        centralTopLimit.put(BlockID.COBBLESTONE_WALL, 1.5);
         centralTopLimit.put(BlockID.FLOWER_POT, 0.375);
         centralTopLimit.put(BlockID.COMPARATOR_OFF, .125);
         centralTopLimit.put(BlockID.COMPARATOR_ON, .125);
         centralTopLimit.put(BlockID.DAYLIGHT_SENSOR, 0.375);
+        centralTopLimit.put(BlockID.HOPPER, 0.625);
 
         // Some default values to be used if no data value is given
         centralTopLimit.put(BlockID.HEAD, 0.75);
@@ -1039,8 +1041,9 @@ public enum BlockType {
     /**
      * Checks if the block type is naturally occuring
      *
-     * @param block
-     * @return
+     * @param id      ID of the block
+     * @param data    Data value of the block
+     * @return true if the block type is naturally occuring
      */
     public static boolean isNaturalTerrainBlock(int id, int data) {
         return isNaturalTerrainBlock.contains(-16*id-data) || isNaturalTerrainBlock.contains(id);
@@ -1049,8 +1052,8 @@ public enum BlockType {
     /**
      * Checks if the block type is naturally occuring
      *
-     * @param block
-     * @return
+     * @param block The block
+     * @return true if the block type is naturally occuring
      */
     public static boolean isNaturalTerrainBlock(Block block) {
         return isNaturalTerrainBlock(block.getId(), block.getData());
@@ -1059,7 +1062,7 @@ public enum BlockType {
     /**
      * Checks if the block type is naturally occuring
      *
-     * @return
+     * @return true if the block type is naturally occuring
      */
     public boolean isNaturalTerrainBlock() {
         return isNaturalTerrainBlock.contains(id);

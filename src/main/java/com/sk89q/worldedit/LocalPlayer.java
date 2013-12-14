@@ -114,9 +114,10 @@ public abstract class LocalPlayer {
 
         while (y >= 0) {
             final Vector pos = new Vector(x, y, z);
-            final BaseBlock block = world.getBlock(pos);
-            if (!BlockType.canPassThrough(block)) {
-                setPosition(new Vector(x + 0.5, y + BlockType.centralTopLimit(block), z + 0.5));
+            final int id = world.getBlockType(pos);
+            final int data = world.getBlockData(pos);
+            if (!BlockType.canPassThrough(id, data)) {
+                setPosition(new Vector(x + 0.5, y + BlockType.centralTopLimit(id, data), z + 0.5));
                 return;
             }
 

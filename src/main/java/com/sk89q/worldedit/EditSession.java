@@ -19,7 +19,6 @@
 package com.sk89q.worldedit;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
@@ -542,18 +541,6 @@ public class EditSession {
         return countBlocks(region, passOn);
     }
 
-    private static boolean containsFuzzy(Collection<BaseBlock> collection, Object o) {
-        // allow -1 data in the searchBlocks to match any type
-        for (BaseBlock b : collection) {
-            if (o instanceof BaseBlock) {
-                if (b.equalsFuzzy((BaseBlock) o)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
     /**
      * Count the number of blocks of a list of types in a region.
      *
@@ -582,7 +569,7 @@ public class EditSession {
                         Vector pt = new Vector(x, y, z);
 
                         BaseBlock compare = new BaseBlock(getBlockType(pt), getBlockData(pt));
-                        if (containsFuzzy(searchBlocks, compare)) {
+                        if (BaseBlock.containsFuzzy(searchBlocks, compare)) {
                             ++count;
                         }
                     }
@@ -591,7 +578,7 @@ public class EditSession {
         } else {
             for (Vector pt : region) {
                 BaseBlock compare = new BaseBlock(getBlockType(pt), getBlockData(pt));
-                if (containsFuzzy(searchBlocks, compare)) {
+                if (BaseBlock.containsFuzzy(searchBlocks, compare)) {
                     ++count;
                 }
             }
@@ -626,8 +613,9 @@ public class EditSession {
     public int getHighestTerrainBlock(int x, int z, int minY, int maxY, boolean naturalOnly) {
         for (int y = maxY; y >= minY; --y) {
             Vector pt = new Vector(x, y, z);
-            BaseBlock block = getBlock(pt);
-            if (naturalOnly ? BlockType.isNaturalTerrainBlock(block) : !BlockType.canPassThrough(block)) {
+            int id = getBlockType(pt);
+            int data = getBlockData(pt);
+            if (naturalOnly ? BlockType.isNaturalTerrainBlock(id, data) : !BlockType.canPassThrough(id, data)) {
                 return y;
             }
         }
@@ -2537,9 +2525,10 @@ public class EditSession {
 
                 loop: for (int y = world.getMaxY(); y >= 1; --y) {
                     final Vector pt = new Vector(x, y, z);
-                    final BaseBlock block = getBlock(pt);
+                    final int id = getBlockType(pt);
+                    final int data = getBlockData(pt);
 
-                    switch (block.getId()) {
+                    switch (id) {
                     case BlockID.DIRT:
                         if (setBlock(pt, grass)) {
                             ++affected;
@@ -2555,7 +2544,7 @@ public class EditSession {
 
                     default:
                         // ...and all non-passable blocks
-                        if (!BlockType.canPassThrough(block)) {
+                        if (!BlockType.canPassThrough(id, data)) {
                             break loop;
                         }
                     }
@@ -3200,7 +3189,7 @@ public class EditSession {
 
         while (!queue.isEmpty()) {
             final BlockVector current = queue.removeFirst();
-            if (!BlockType.canPassThrough(getBlock(current))) {
+            if (!BlockType.canPassThrough(getBlockType(current), getBlockData(current))) {
                 continue;
             }
 
