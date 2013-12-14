@@ -42,7 +42,7 @@ public abstract class LocalPlayer {
     /**
      * Construct the object.
      *
-     * @param server
+     * @param server A reference to the server this player is on
      */
     protected LocalPlayer(ServerInterface server) {
         this.server = server;
@@ -104,7 +104,7 @@ public abstract class LocalPlayer {
     /**
      * Set the player on the ground.
      *
-     * @param searchPos
+     * @param searchPos The location to start searching from
      */
     public void setOnGround(WorldVector searchPos) {
         LocalWorld world = searchPos.getWorld();
@@ -231,10 +231,21 @@ public abstract class LocalPlayer {
     /**
      * Ascend to the ceiling above.
      *
-     * @param clearance
+     * @param clearance How many blocks to leave above the player's head
      * @return whether the player was moved
      */
     public boolean ascendToCeiling(int clearance) {
+        return ascendToCeiling(clearance, true);
+    }
+
+    /**
+     * Ascend to the ceiling above.
+     *
+     * @param clearance How many blocks to leave above the player's head
+     * @param alwaysGlass Always put glass under the player
+     * @return whether the player was moved
+     */
+    public boolean ascendToCeiling(int clearance, boolean alwaysGlass) {
         Vector pos = getBlockIn();
         int x = pos.getBlockX();
         int initialY = Math.max(0, pos.getBlockY());
@@ -251,8 +262,7 @@ public abstract class LocalPlayer {
             // Found a ceiling!
             if (!BlockType.canPassThrough(world.getBlock(new Vector(x, y, z)))) {
                 int platformY = Math.max(initialY, y - 3 - clearance);
-                world.setBlockType(new Vector(x, platformY, z), BlockID.GLASS);
-                setPosition(new Vector(x + 0.5, platformY + 1, z + 0.5));
+                floatAt(x, platformY + 1, z, alwaysGlass);
                 return true;
             }
 
@@ -265,17 +275,28 @@ public abstract class LocalPlayer {
     /**
      * Just go up.
      *
-     * @param distance
+     * @param distance How far up to teleport
      * @return whether the player was moved
      */
     public boolean ascendUpwards(int distance) {
-        Vector pos = getBlockIn();
-        int x = pos.getBlockX();
-        int initialY = Math.max(0, pos.getBlockY());
+        return ascendUpwards(distance, true);
+    }
+
+    /**
+     * Just go up.
+     *
+     * @param distance How far up to teleport
+     * @param alwaysGlass Always put glass under the player
+     * @return whether the player was moved
+     */
+    public boolean ascendUpwards(int distance, boolean alwaysGlass) {
+        final Vector pos = getBlockIn();
+        final int x = pos.getBlockX();
+        final int initialY = Math.max(0, pos.getBlockY());
         int y = Math.max(0, pos.getBlockY() + 1);
-        int z = pos.getBlockZ();
-        int maxY = Math.min(getWorld().getMaxY() + 1, initialY + distance);
-        LocalWorld world = getPosition().getWorld();
+        final int z = pos.getBlockZ();
+        final int maxY = Math.min(getWorld().getMaxY() + 1, initialY + distance);
+        final LocalWorld world = getPosition().getWorld();
 
         while (y <= world.getMaxY() + 2) {
             if (!BlockType.canPassThrough(world.getBlock(new Vector(x, y, z)))) {
@@ -283,8 +304,7 @@ public abstract class LocalPlayer {
             } else if (y > maxY + 1) {
                 break;
             } else if (y == maxY + 1) {
-                world.setBlockType(new Vector(x, y - 2, z), BlockID.GLASS);
-                setPosition(new Vector(x + 0.5, y - 1, z + 0.5));
+                floatAt(x, y - 1, z, alwaysGlass);
                 return true;
             }
 
@@ -292,6 +312,18 @@ public abstract class LocalPlayer {
         }
 
         return false;
+    }
+
+    /**
+     * Make the player float in the given blocks.
+     *
+     * @param x The X coordinate of the block to float in
+     * @param y The Y coordinate of the block to float in
+     * @param z The Z coordinate of the block to float in
+     */
+    public void floatAt(int x, int y, int z, boolean alwaysGlass) {
+        getPosition().getWorld().setBlockType(new Vector(x, y - 1, z), BlockID.GLASS);
+        setPosition(new Vector(x + 0.5, y, z + 0.5));
     }
 
     /**
@@ -320,8 +352,8 @@ public abstract class LocalPlayer {
      * Get the point of the block being looked at. May return null.
      * Will return the farthest away air block if useLastBlock is true and no other block is found.
      *
-     * @param range
-     * @param useLastBlock
+     * @param range How far to checks for blocks
+     * @param useLastBlock Try to return the last valid air block found.
      * @return point
      */
     public WorldVector getBlockTrace(int range, boolean useLastBlock) {
@@ -337,7 +369,7 @@ public abstract class LocalPlayer {
     /**
      * Get the point of the block being looked at. May return null.
      *
-     * @param range
+     * @param range How far to checks for blocks
      * @return point
      */
     public WorldVector getBlockTrace(int range) {
@@ -347,7 +379,7 @@ public abstract class LocalPlayer {
     /**
      * Get the point of the block being looked at. May return null.
      *
-     * @param range
+     * @param range How far to checks for blocks
      * @return point
      */
     public WorldVector getSolidBlockTrace(int range) {
@@ -358,7 +390,7 @@ public abstract class LocalPlayer {
     /**
      * Get the player's cardinal direction (N, W, NW, etc.). May return null.
      *
-     * @return
+     * @return the direction
      */
     public PlayerDirection getCardinalDirection() {
         return getCardinalDirection(0);
@@ -368,7 +400,7 @@ public abstract class LocalPlayer {
      * Get the player's cardinal direction (N, W, NW, etc.) with an offset. May return null.
      * @param yawOffset offset that is added to the player's yaw before determining the cardinal direction
      *
-     * @return
+     * @return the direction
      */
     public PlayerDirection getCardinalDirection(int yawOffset) {
         if (getPitch() > 67.5) {
@@ -389,8 +421,8 @@ public abstract class LocalPlayer {
     /**
      * Returns direction according to rotation. May return null.
      *
-     * @param rot
-     * @return
+     * @param rot yaw
+     * @return the direction
      */
     private static PlayerDirection getDirection(double rot) {
         if (0 <= rot && rot < 22.5) {
@@ -419,9 +451,22 @@ public abstract class LocalPlayer {
     /**
      * Get the ID of the item that the player is holding.
      *
-     * @return
+     * @return the item id of the item the player is holding
      */
     public abstract int getItemInHand();
+
+    /**
+     * Get the Block that the player is holding.
+     *
+     * @return the item id of the item the player is holding
+     */
+    public BaseBlock getBlockInHand() throws WorldEditException {
+        final int typeId = getItemInHand();
+        if (!getWorld().isValidBlockType(typeId)) {
+            throw new NotABlockException(typeId);
+        }
+        return new BaseBlock(typeId);
+    }
 
     /**
      * Get the name of the player.
@@ -471,15 +516,15 @@ public abstract class LocalPlayer {
     /**
      * Gives the player an item.
      *
-     * @param type
-     * @param amt
+     * @param type The item id of the item to be given to the player
+     * @param amount How many items in the stack
      */
-    public abstract void giveItem(int type, int amt);
+    public abstract void giveItem(int type, int amount);
 
     /**
      * Pass through the wall that you are looking at.
      *
-     * @param range
+     * @param range How far to checks for blocks
      * @return whether the player was pass through
      */
     public boolean passThroughForwardWall(int range) {
@@ -528,44 +573,44 @@ public abstract class LocalPlayer {
     /**
      * Print a message.
      *
-     * @param msg
+     * @param msg The message text
      */
     public abstract void printRaw(String msg);
 
     /**
      * Print a WorldEdit message.
      *
-     * @param msg
+     * @param msg The message text
      */
     public abstract void printDebug(String msg);
 
     /**
      * Print a WorldEdit message.
      *
-     * @param msg
+     * @param msg The message text
      */
     public abstract void print(String msg);
 
     /**
      * Print a WorldEdit error.
      *
-     * @param msg
+     * @param msg The error message text
      */
     public abstract void printError(String msg);
 
     /**
      * Move the player.
      *
-     * @param pos
-     * @param pitch
-     * @param yaw
+     * @param pos Where to move them
+     * @param pitch The pitch (up/down) of the player's view
+     * @param yaw The yaw (left/right) of the player's view
      */
     public abstract void setPosition(Vector pos, float pitch, float yaw);
 
     /**
      * Move the player.
      *
-     * @param pos
+     * @param pos Where to move them
      */
     public void setPosition(Vector pos) {
         setPosition(pos, (float) getPitch(), (float) getYaw());
@@ -574,22 +619,22 @@ public abstract class LocalPlayer {
     /**
      * Get a player's list of groups.
      *
-     * @return
+     * @return an array containing a group name per entry
      */
     public abstract String[] getGroups();
 
     /**
      * Get this player's block bag.
      *
-     * @return
+     * @return the player's block bag
      */
     public abstract BlockBag getInventoryBlockBag();
 
     /**
      * Checks if a player has permission.
      *
-     * @param perm
-     * @return
+     * @param perm The permission to check
+     * @return true if the player has that permission
      */
     public abstract boolean hasPermission(String perm);
 
@@ -597,7 +642,7 @@ public abstract class LocalPlayer {
      * Open a file open dialog.
      *
      * @param extensions null to allow all
-     * @return
+     * @return the selected file or null if something went wrong
      */
     public File openFileOpenDialog(String[] extensions) {
         printError("File dialogs are not supported in your environment.");
@@ -608,7 +653,7 @@ public abstract class LocalPlayer {
      * Open a file save dialog.
      *
      * @param extensions null to allow all
-     * @return
+     * @return the selected file or null if something went wrong
      */
     public File openFileSaveDialog(String[] extensions) {
         printError("File dialogs are not supported in your environment.");
@@ -640,12 +685,6 @@ public abstract class LocalPlayer {
     public void dispatchCUIHandshake() {
     }
 
-    /**
-     * Returns true if equal.
-     *
-     * @param other
-     * @return whether the other object is equivalent
-     */
     @Override
     public boolean equals(Object other) {
         if (!(other instanceof LocalPlayer)) {
@@ -655,11 +694,6 @@ public abstract class LocalPlayer {
         return other2.getName().equals(getName());
     }
 
-    /**
-     * Gets the hash code.
-     *
-     * @return hash code
-     */
     @Override
     public int hashCode() {
         return getName().hashCode();

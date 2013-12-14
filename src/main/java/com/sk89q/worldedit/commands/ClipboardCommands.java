@@ -29,6 +29,7 @@ import com.sk89q.minecraft.util.commands.NestedCommand;
 import com.sk89q.worldedit.*;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.blocks.BlockID;
+import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 
 /**
@@ -64,9 +65,15 @@ public class ClipboardCommands {
         Vector pos = session.getPlacementPosition(player);
 
         CuboidClipboard clipboard = new CuboidClipboard(
-                max.subtract(min).add(new Vector(1, 1, 1)),
+                max.subtract(min).add(Vector.ONE),
                 min, min.subtract(pos));
-        clipboard.copy(editSession);
+
+        if (region instanceof CuboidRegion) {
+            clipboard.copy(editSession);
+        } else {
+            clipboard.copy(editSession, region);
+        }
+
         if (args.hasFlag('e')) {
             for (LocalEntity entity : player.getWorld().getEntities(region)) {
                 clipboard.storeEntity(entity);
@@ -107,9 +114,15 @@ public class ClipboardCommands {
         Vector pos = session.getPlacementPosition(player);
 
         CuboidClipboard clipboard = new CuboidClipboard(
-                max.subtract(min).add(new Vector(1, 1, 1)),
+                max.subtract(min).add(Vector.ONE),
                 min, min.subtract(pos));
-        clipboard.copy(editSession);
+
+        if (region instanceof CuboidRegion) {
+            clipboard.copy(editSession);
+        } else {
+            clipboard.copy(editSession, region);
+        }
+
         if (args.hasFlag('e')) {
             LocalEntity[] entities = world.getEntities(region);
             for (LocalEntity entity : entities) {
@@ -119,7 +132,7 @@ public class ClipboardCommands {
         }
         session.setClipboard(clipboard);
 
-        editSession.setBlocks(session.getSelection(world), block);
+        editSession.setBlocks(region, block);
         player.print("Block(s) cut.");
     }
 

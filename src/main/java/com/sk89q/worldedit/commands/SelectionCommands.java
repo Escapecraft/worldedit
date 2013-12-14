@@ -44,6 +44,7 @@ import com.sk89q.worldedit.WorldEditException;
 import com.sk89q.worldedit.blocks.BaseBlock;
 import com.sk89q.worldedit.blocks.BlockType;
 import com.sk89q.worldedit.data.ChunkStore;
+import com.sk89q.worldedit.regions.ConvexPolyhedralRegionSelector;
 import com.sk89q.worldedit.regions.CuboidRegionSelector;
 import com.sk89q.worldedit.regions.CylinderRegionSelector;
 import com.sk89q.worldedit.regions.EllipsoidRegionSelector;
@@ -334,7 +335,7 @@ public class SelectionCommands {
             return;
         }
 
-        Vector dir;
+        List<Vector> dirs = new ArrayList<Vector>();
         int change = args.getInteger(0);
         int reverseChange = 0;
 
@@ -343,30 +344,49 @@ public class SelectionCommands {
             // Either a reverse amount or a direction
             try {
                 reverseChange = args.getInteger(1);
-                dir = we.getDirection(player, "me");
+                dirs.add(we.getDirection(player, "me"));
             } catch (NumberFormatException e) {
-                dir = we.getDirection(player,
-                        args.getString(1).toLowerCase());
+                if (args.getString(1).contains(",")) {
+                    String[] split = args.getString(1).split(",");
+                    for (String s : split) {
+                        dirs.add(we.getDirection(player, s.toLowerCase()));
+                    }
+                } else {
+                    dirs.add(we.getDirection(player, args.getString(1).toLowerCase()));
+                }
             }
             break;
 
         case 3:
             // Both reverse amount and direction
             reverseChange = args.getInteger(1);
-            dir = we.getDirection(player,
-                    args.getString(2).toLowerCase());
+            if (args.getString(2).contains(",")) {
+                String[] split = args.getString(2).split(",");
+                for (String s : split) {
+                    dirs.add(we.getDirection(player, s.toLowerCase()));
+                }
+            } else {
+                dirs.add(we.getDirection(player, args.getString(2).toLowerCase()));
+            }
             break;
+
         default:
-            dir = we.getDirection(player, "me");
+            dirs.add(we.getDirection(player, "me"));
+            break;
+
         }
 
         Region region = session.getSelection(player.getWorld());
         int oldSize = region.getArea();
 
         if (reverseChange == 0) {
-            region.expand(dir.multiply(change));
+            for (Vector dir : dirs) {
+                region.expand(dir.multiply(change));
+            }
         } else {
-            region.expand(dir.multiply(change), dir.multiply(-reverseChange));
+            for (Vector dir : dirs) {
+                region.expand(dir.multiply(change), dir.multiply(-reverseChange));
+            }
         }
 
         session.getRegionSelector(player.getWorld()).learnChanges();
@@ -389,7 +409,7 @@ public class SelectionCommands {
     public void contract(CommandContext args, LocalSession session, LocalPlayer player,
             EditSession editSession) throws WorldEditException {
 
-        Vector dir;
+        List<Vector> dirs = new ArrayList<Vector>();
         int change = args.getInteger(0);
         int reverseChange = 0;
 
@@ -398,28 +418,48 @@ public class SelectionCommands {
             // Either a reverse amount or a direction
             try {
                 reverseChange = args.getInteger(1);
-                dir = we.getDirection(player, "me");
+                dirs.add(we.getDirection(player, "me"));
             } catch (NumberFormatException e) {
-                dir = we.getDirection(player, args.getString(1).toLowerCase());
+                if (args.getString(1).contains(",")) {
+                    String[] split = args.getString(1).split(",");
+                    for (String s : split) {
+                        dirs.add(we.getDirection(player, s.toLowerCase()));
+                    }
+                } else {
+                    dirs.add(we.getDirection(player, args.getString(1).toLowerCase()));
+                }
             }
             break;
 
         case 3:
             // Both reverse amount and direction
             reverseChange = args.getInteger(1);
-            dir = we.getDirection(player, args.getString(2).toLowerCase());
+            if (args.getString(2).contains(",")) {
+                String[] split = args.getString(2).split(",");
+                for (String s : split) {
+                    dirs.add(we.getDirection(player, s.toLowerCase()));
+                }
+            } else {
+                dirs.add(we.getDirection(player, args.getString(2).toLowerCase()));
+            }
             break;
+
         default:
-            dir = we.getDirection(player, "me");
+            dirs.add(we.getDirection(player, "me"));
+            break;
         }
 
         try {
             Region region = session.getSelection(player.getWorld());
             int oldSize = region.getArea();
             if (reverseChange == 0) {
-                region.contract(dir.multiply(change));
+                for (Vector dir : dirs) {
+                    region.contract(dir.multiply(change));
+                }
             } else {
-                region.contract(dir.multiply(change), dir.multiply(-reverseChange));
+                for (Vector dir : dirs) {
+                    region.contract(dir.multiply(change), dir.multiply(-reverseChange));
+                }
             }
             session.getRegionSelector(player.getWorld()).learnChanges();
             int newSize = region.getArea();
@@ -444,18 +484,28 @@ public class SelectionCommands {
     @CommandPermissions("worldedit.selection.shift")
     public void shift(CommandContext args, LocalSession session, LocalPlayer player,
             EditSession editSession) throws WorldEditException {
-        Vector dir;
 
+        List<Vector> dirs = new ArrayList<Vector>();
         int change = args.getInteger(0);
         if (args.argsLength() == 2) {
-            dir = we.getDirection(player, args.getString(1).toLowerCase());
+            if (args.getString(1).contains(",")) {
+                for (String s : args.getString(1).split(",")) {
+                    dirs.add(we.getDirection(player, s.toLowerCase()));
+                }
+            } else {
+                dirs.add(we.getDirection(player, args.getString(1).toLowerCase()));
+            }
         } else {
-            dir = we.getDirection(player, "me");
+            dirs.add(we.getDirection(player, "me"));
         }
 
         try {
             Region region = session.getSelection(player.getWorld());
-            region.shift(dir.multiply(change));
+
+            for (Vector dir : dirs) {
+                region.shift(dir.multiply(change));
+            }
+
             session.getRegionSelector(player.getWorld()).learnChanges();
 
             session.getRegionSelector(player.getWorld()).explainRegionAdjust(player, session);
@@ -552,7 +602,7 @@ public class SelectionCommands {
 
             player.print("Size: " + size);
             player.print("Offset: " + offset);
-            player.print("Cuboid distance: " + size.distance( new Vector(1, 1, 1)));
+            player.print("Cuboid distance: " + size.distance(Vector.ONE));
             player.print("# of blocks: " 
                          + (int) (size.getX() * size.getY() * size.getZ()));
             return;
@@ -675,7 +725,7 @@ public class SelectionCommands {
 
     @Command(
         aliases = { "/sel", ";" },
-        usage = "[cuboid|extend|poly|ellipsoid|sphere|cyl]",
+        usage = "[cuboid|extend|poly|ellipsoid|sphere|cyl|convex]",
         desc = "Choose a region selector",
         min = 0,
         max = 1
@@ -713,12 +763,16 @@ public class SelectionCommands {
             player.print("Ellipsoid selector: left click=center, right click to extend");
         } else if (typeName.equalsIgnoreCase("sphere")) {
             selector = new SphereRegionSelector(oldSelector);
-            player.print("Sphere selector: left click=center, right click to extend");
+            player.print("Sphere selector: left click=center, right click to set radius");
         } else if (typeName.equalsIgnoreCase("cyl")) {
             selector = new CylinderRegionSelector(oldSelector);
             player.print("Cylindrical selector: Left click=center, right click to extend.");
+        } else if (typeName.equalsIgnoreCase("convex") || typeName.equalsIgnoreCase("hull") || typeName.equalsIgnoreCase("polyhedron")) {
+            int maxVertices = we.getMaximumPolyhedronPoints(player);
+            selector = new ConvexPolyhedralRegionSelector(oldSelector, maxVertices);
+            player.print("Convex polyhedral selector: Left click=First vertex, right click to add more.");
         } else {
-            player.printError("Only cuboid|extend|poly|ellipsoid|sphere|cyl are accepted.");
+            player.printError("Only cuboid|extend|poly|ellipsoid|sphere|cyl|convex are accepted.");
             return;
         }
 
